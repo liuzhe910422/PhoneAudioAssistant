@@ -117,8 +117,14 @@ public:
         SpiLcdDisplay::SetupUI();
 
         DisplayLockGuard lock(this);
-        lv_obj_set_style_pad_left(status_bar_, LV_HOR_RES*  0.1, 0);
-        lv_obj_set_style_pad_right(status_bar_, LV_HOR_RES*  0.1, 0);
+        // The status icons live in top_bar_, which sits flush against the
+        // screen edges, so the rounded corners clip them.
+        if (top_bar_ != nullptr) {
+            lv_obj_set_style_pad_left(top_bar_, DISPLAY_CORNER_INSET, 0);
+            lv_obj_set_style_pad_right(top_bar_, DISPLAY_CORNER_INSET, 0);
+        }
+        lv_obj_set_style_pad_left(status_bar_, DISPLAY_CORNER_INSET, 0);
+        lv_obj_set_style_pad_right(status_bar_, DISPLAY_CORNER_INSET, 0);
         lv_display_add_event_cb(display_, rounder_event_cb, LV_EVENT_INVALIDATE_AREA, NULL);
     }
 };
