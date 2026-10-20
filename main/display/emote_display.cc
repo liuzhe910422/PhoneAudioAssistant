@@ -136,10 +136,27 @@ EmoteDisplay::~EmoteDisplay() {
 }
 
 void EmoteDisplay::SetEmotion(const char* const emotion) {
+    ApplyEmotion(emotion);
+}
+
+// The signal already exists; it was being thrown away.
+//
+// emote_set_anim_emoji returns esp_err_t, and an emotion that is not in the mounted asset pack
+// fails inside it - emote_get_emoji_data_by_name logs Not found:"<name>" at debug level, which
+// the default log level strips. So a caller asking for a face the pack does not carry was told
+// nothing, saw no error, and watched the previous face stay on screen. Anything built on top -
+// an MCP tool, a server-driven emotion, a board's own avatar mapping - had no way to find out.
+bool EmoteDisplay::ApplyEmotion(const char* const emotion) {
     ESP_LOGI(TAG, "SetEmotion: %s", emotion);
-    if (emote_handle_ && emotion && strlen(emotion) > 0) {
-        emote_set_anim_emoji(emote_handle_, emotion);
+    if (emote_handle_ == nullptr || emotion == nullptr || strlen(emotion) == 0) {
+        return false;
     }
+    esp_err_t err = emote_set_anim_emoji(emote_handle_, emotion);
+    if (err != ESP_OK) {
+        ESP_LOGW(TAG, "emotion \"%s\" not applied: %s", emotion, esp_err_to_name(err));
+        return false;
+    }
+    return true;
 }
 
 void EmoteDisplay::SetChatMessage(const char* const role, const char* const content) {
