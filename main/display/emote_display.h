@@ -18,6 +18,7 @@ public:
     virtual ~EmoteDisplay();
 
     virtual void SetEmotion(const char* emotion) override;
+    virtual bool ApplyEmotion(const char* emotion) override;
     virtual void SetStatus(const char* status) override;
     virtual void SetChatMessage(const char* role, const char* content) override;
     virtual void SetTheme(Theme* theme) override;

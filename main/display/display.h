@@ -44,6 +44,11 @@ public:
     virtual void ShowNotification(const char* notification, int duration_ms = 3000);
     virtual void ShowNotification(const std::string& notification, int duration_ms = 3000);
     virtual void SetEmotion(const char* emotion);
+    // Same thing, but says whether it worked. The default implementation calls SetEmotion and
+    // reports true, which keeps every existing display compiling and behaving as before: a
+    // display that cannot tell reports no failure. Only displays that can actually detect a
+    // rejected emotion override this.
+    virtual bool ApplyEmotion(const char* emotion);
     virtual void SetChatMessage(const char* role, const char* content);
     // Remove a matching message without clearing newer content, when supported.
     virtual void RemoveChatMessage(const char* role, const char* content) {}
