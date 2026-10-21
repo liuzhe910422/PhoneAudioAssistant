@@ -117,8 +117,14 @@ public:
         SpiLcdDisplay::SetupUI();
 
         DisplayLockGuard lock(this);
-        lv_obj_set_style_pad_left(status_bar_, LV_HOR_RES*  0.1, 0);
-        lv_obj_set_style_pad_right(status_bar_, LV_HOR_RES*  0.1, 0);
+        // The status icons live in top_bar_, which sits flush against the
+        // screen edges, so the rounded corners clip them.
+        if (top_bar_ != nullptr) {
+            lv_obj_set_style_pad_left(top_bar_, DISPLAY_CORNER_INSET, 0);
+            lv_obj_set_style_pad_right(top_bar_, DISPLAY_CORNER_INSET, 0);
+        }
+        lv_obj_set_style_pad_left(status_bar_, DISPLAY_CORNER_INSET, 0);
+        lv_obj_set_style_pad_right(status_bar_, DISPLAY_CORNER_INSET, 0);
         lv_display_add_event_cb(display_, rounder_event_cb, LV_EVENT_INVALIDATE_AREA, NULL);
     }
 };
@@ -280,8 +286,9 @@ private:
             },
             .flags = {
                 .swap_xy = 0,
-                .mirror_x = 1,
-                .mirror_y = 1,
+                // Mirroring both axes is a 180 degree rotation.
+                .mirror_x = 0,
+                .mirror_y = 0,
             },
         };
         esp_lcd_panel_io_handle_t tp_io_handle = NULL;
